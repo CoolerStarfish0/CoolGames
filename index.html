@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>5158 Games</title>
+
+<style>
+    :root {
+        --bg: #07070b;
+        --panel: #101018;
+        --panel2: #151522;
+        --purple: #8b5cf6;
+        --purple2: #a855f7;
+        --white: #f5f3ff;
+        --muted: #9994aa;
+        --border: rgba(168,85,247,0.2);
+    }
+
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        font-family: Arial, Helvetica, sans-serif;
+        background:
+            radial-gradient(circle at 50% -10%, rgba(139,92,246,0.18), transparent 35%),
+            var(--bg);
+        color: var(--white);
+        min-height: 100vh;
+    }
+
+    header {
+        height: 72px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 32px;
+        border-bottom: 1px solid var(--border);
+        background: rgba(7,7,11,0.85);
+        backdrop-filter: blur(15px);
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    .logo {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 21px;
+        font-weight: 800;
+    }
+
+    .logo-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 11px;
+        display: grid;
+        place-items: center;
+        background: linear-gradient(135deg, var(--purple), var(--purple2));
+        box-shadow: 0 0 25px rgba(139,92,246,0.35);
+        font-size: 20px;
+    }
+
+    .header-button {
+        border: 1px solid var(--border);
+        background: var(--panel);
+        color: var(--white);
+        padding: 10px 16px;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .header-button:hover {
+        border-color: var(--purple);
+        transform: translateY(-1px);
+    }
+
+    .hero {
+        text-align: center;
+        padding: 75px 20px 45px;
+    }
+
+    .hero-bolt {
+        font-size: 50px;
+        filter: drop-shadow(0 0 20px rgba(168,85,247,0.7));
+        margin-bottom: 15px;
+    }
+
+    .hero h1 {
+        font-size: clamp(45px, 8vw, 82px);
+        font-weight: 900;
+        letter-spacing: -4px;
+        background: linear-gradient(135deg, #fff, #c4b5fd, #a855f7);
+        -webkit-background-clip: text;
+        color: transparent;
+    }
+
+    .hero p {
+        margin-top: 12px;
+        color: var(--muted);
+        font-size: 17px;
+    }
+
+    .games {
+        width: min(1100px, calc(100% - 40px));
+        margin: auto;
+        padding-bottom: 70px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+        gap: 18px;
+    }
+
+    .game-card {
+        background: linear-gradient(145deg, var(--panel), #0c0c12);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        padding: 24px;
+        min-height: 250px;
+        display: flex;
+        flex-direction: column;
+        transition: 0.25s;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .game-card::before {
+        content: "";
+        position: absolute;
+        width: 180px;
+        height: 180px;
+        background: rgba(139,92,246,0.12);
+        filter: blur(60px);
+        top: -80px;
+        right: -60px;
+        pointer-events: none;
+    }
+
+    .game-card:hover {
+        transform: translateY(-5px);
+        border-color: rgba(168,85,247,0.55);
+        box-shadow: 0 15px 45px rgba(0,0,0,0.35);
+    }
+
+    .game-icon {
+        font-size: 43px;
+        margin-bottom: 20px;
+    }
+
+    .game-card h2 {
+        font-size: 22px;
+        margin-bottom: 8px;
+    }
+
+    .game-card p {
+        color: var(--muted);
+        line-height: 1.5;
+        font-size: 14px;
+    }
+
+    .play-button {
+        margin-top: auto;
+        padding: 12px;
+        border: none;
+        border-radius: 10px;
+        background: linear-gradient(135deg, var(--purple), var(--purple2));
+        color: white;
+        font-weight: 800;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .play-button:hover {
+        transform: scale(1.02);
+        box-shadow: 0 0 25px rgba(139,92,246,0.3);
+    }
+
+    /* GAME SCREEN */
+
+    #gameScreen {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.78);
+        backdrop-filter: blur(12px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 100;
+        padding: 20px;
+    }
+
+    #gameScreen.active {
+        display: flex;
+    }
+
+    .game-window {
+        width: min(900px, 100%);
+        max-height: 92vh;
+        background: #0b0b11;
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 30px 100px rgba(0,0,0,0.7);
+    }
+
+    .game-header {
+        height: 62px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 18px;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .game-header h2 {
+        font-size: 18px;
+    }
+
+    .close-button {
+        width: 36px;
+        height: 36px;
+        border-radius: 9px;
+        border: 1px solid var(--border);
+        background: var(--panel);
+        color: white;
+        cursor: pointer;
+        font-size: 18px;
+    }
+
+    .game-content {
+        padding: 25px;
+    }
+
+    /* COMMON GAME UI */
+
+    .scoreboard {
+        display: flex;
+        justify-content: center;
+        gap: 35px;
+        margin-bottom: 18px;
+        color: var(--muted);
+    }
+
+    .scoreboard strong {
+        color: white;
+        font-size: 21px;
+    }
+
+    .start-button {
+        display: block;
+        margin: 25px auto;
+        border: none;
+        border-radius: 11px;
+        padding: 13px 25px;
+        background: linear-gradient(135deg, var(--purple), var(--purple2));
+        color: white;
+        font-weight: 800;
+        cursor: pointer;
+        font-size: 15px;
+    }
+
+    /* LIGHTNING */
+
+    .lightning-ui {
+        text-align: center;
+    }
+
+    #lightningArea {
+        height: 400px;
+        border: 1px solid var(--border);
+        border-radius: 15px;
+        background:
+            radial-gradient(circle at center, rgba(139,92,246,0.08), transparent 50%),
+            #08080d;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .lightning-target {
+        position: absolute;
+        font-size: 35px;
+        cursor: pointer;
+        display: none;
+        user-select: none;
+        filter: drop-shadow(0 0 12px rgba(168,85,247,0.8));
+        transition: transform 0.1s;
+    }
+
+    .lightning-target:hover {
+        transform: scale(1.15);
+    }
+
+    /* TARGET */
+
+    .target-ui {
+        text-align: center;
+    }
+
+    #targetArea {
+        height: 420px;
+        border: 1px solid var(--border);
+        border-radius: 15px;
+        background:
+            radial-gradient(circle at center, rgba(139,92,246,0.07), transparent 55%),
+            #08080d;
+        position: relative;
+        overflow: hidden;
+        cursor: crosshair;
+    }
+
+    .target-circle {
+        position: absolute;
+        width: 65px;
+        height: 65px;
+        border-radius: 50%;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        user-select: none;
+
+        background:
+            radial-gradient(circle,
+                white 0 12%,
+                #d8b4fe 13% 28%,
+                #8b5cf6 29% 50%,
+                #4c1d95 51% 70%,
+                transparent 71%
+            );
+
+        box-shadow:
+            0 0 12px rgba(168,85,247,0.8),
+            0 0 30px rgba(139,92,246,0.4);
+
+        transition:
+            width 0.12s ease,
+            height 0.12s ease,
+            box-shadow 0.12s ease;
+    }
+
+    .target-circle:active {
+        transform: scale(0.88);
+    }
+
+    .target-countdown {
+        text-align: center;
+        color: var(--muted);
+        margin-top: 10px;
+        min-height: 20px;
+    }
+
+    .results {
+        text-align: center;
+        padding: 35px 10px;
+    }
+
+    .results h1 {
+        font-size: 42px;
+        margin-bottom: 15px;
+    }
+
+    .results-score {
+        font-size: 65px;
+        font-weight: 900;
+        background: linear-gradient(135deg, #fff, #c4b5fd, #a855f7);
+        -webkit-background-clip: text;
+        color: transparent;
+    }
+
+    .results p {
+        color: var(--muted);
+        margin: 8px;
+    }
+
+    .hidden {
+        display: none !important;
+    }
+
+    /* PLACEHOLDERS */
+
+    .placeholder {
+        text-align: center;
+        padding: 100px 20px;
+        color: var(--muted);
+    }
+
+    .placeholder h1 {
+        color: white;
+        margin-bottom: 10px;
+    }
+
+    @media (max-width: 600px) {
+        header {
+            padding: 0 16px;
+        }
+
+        .hero {
+            padding-top: 50px;
+        }
+
+        .game-content {
+            padding: 15px;
+        }
+
+        #targetArea,
+        #lightningArea {
+            height: 350px;
+        }
+
+        .scoreboard {
+            gap: 18px;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">
+        <div class="logo-icon">⚡</div>
+        5158 Games
+    </div>
+
+    <button class="header-button" onclick="alert('More games coming soon 👀')">
+        Games
+    </button>
+</header>
+
+<section class="hero">
+    <div class="hero-bolt">⚡</div>
+    <h1>5158 GAMES</h1>
+    <p>Tiny games. Big skill issue.</p>
+</section>
+
+<section class="games">
+
+    <div class="game-card">
+        <div class="game-icon">⚡</div>
+        <h2>Lightning Rush</h2>
+        <p>Wait for the lightning. Click it as fast as possible. Don't jump the gun.</p>
+        <button class="play-button" onclick="openGame('lightning')">
+            PLAY
+        </button>
+    </div>
+
+    <div class="game-card">
+        <div class="game-icon">🎯</div>
+        <h2>Target</h2>
+        <p>How many targets can you destroy in 30 seconds?</p>
+        <button class="play-button" onclick="openGame('target')">
+            PLAY
+        </button>
+    </div>
+
+    <div class="game-card">
+        <div class="game-icon">🟦</div>
+        <h2>Dodge</h2>
+        <p>Something is coming at you. Move.</p>
+        <button class="play-button" onclick="openGame('dodge')">
+            PLAY
+        </button>
+    </div>
+
+    <div class="game-card">
+        <div class="game-icon">🧠</div>
+        <h2>Memory</h2>
+        <p>Remember the pattern. Don't get cooked.</p>
+        <button class="play-button" onclick="openGame('memory')">
+            PLAY
+        </button>
+    </div>
+
+</section>
+
+<!-- GAME MODAL -->
+
+<div id="gameScreen">
+
+    <div class="game-window">
+
+        <div class="game-header">
+            <h2 id="gameTitle">Game</h2>
+
+            <button class="close-button" onclick="closeGame()">
+                ✕
+            </button>
+        </div>
+
+        <div class="game-content">
+
+            <!-- LIGHTNING -->
+
+            <div id="lightningGame" class="lightning-ui hidden">
+
+                <div class="scoreboard">
+                    <div>
+                        Score<br>
+                        <strong id="lightningScore">0</strong>
+                    </div>
+
+                    <div>
+                        Best<br>
+                        <strong id="lightningBest">0</strong>
+                    </div>
+                </div>
+
+                <div id="lightningArea">
+                    <div
+                        id="lightningTarget"
+                        class="lightning-target"
+                        onclick="hitLightning()"
+                    >
+                        ⚡
+                    </div>
+                </div>
+
+                <button
+                    id="lightningStart"
+                    class="start-button"
+                    onclick="startLightning()"
+                >
+                    START
+                </button>
+
+            </div>
+
+            <!-- TARGET -->
+
+            <div id="targetGame" class="target-ui hidden">
+
+                <div class="scoreboard">
+
+                    <div>
+                        Score<br>
+                        <strong id="targetScore">0</strong>
+                    </div>
+
+                    <div>
+                        Best<br>
+                        <strong id="targetBest">0</strong>
+                    </div>
+
+                    <div>
+                        Time<br>
+                        <strong id="targetTime">30</strong>
+                    </div>
+
+                    <div>
+                        Accuracy<br>
+                        <strong id="targetAccuracy">100%</strong>
+                    </div>
+
+                </div>
+
+                <div id="targetArea">
+
+                    <div
+                        id="targetCircle"
+                        class="target-circle"
+                        onclick="hitTarget(event)"
+                    ></div>
+
+                </div>
+
+                <div
+                    id="targetCountdown"
+                    class="target-countdown"
+                >
+                    Click START to begin.
+                </div>
+
+                <button
+                    id="targetStart"
+                    class="start-button"
+                    onclick="startTarget()"
+                >
+                    START
+                </button>
+
+                <div id="targetResults" class="results hidden">
+
+                    <h1>ROUND OVER</h1>
+
+                    <div
+                        id="targetFinalScore"
+                        class="results-score"
+                    >
+                        0
+                    </div>
+
+                    <p id="targetFinalBest">
+                        Best: 0
+                    </p>
+
+                    <p id="targetFinalAccuracy">
+                        Accuracy: 100%
+                    </p>
+
+                    <p id="targetFinalMessage"></p>
+
+                    <button
+                        class="start-button"
+                        onclick="startTarget()"
+                    >
+                        PLAY AGAIN
+                    </button>
+
+                </div>
+
+            </div>
+
+            <!-- DODGE -->
+
+            <div id="dodgeGame" class="placeholder hidden">
+                <h1>🟦 Dodge</h1>
+                <p>This game is coming next 👀</p>
+            </div>
+
+            <!-- MEMORY -->
+
+            <div id="memoryGame" class="placeholder hidden">
+                <h1>🧠 Memory</h1>
+                <p>This game is coming next 👀</p>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+
+/* =========================================================
+   GENERAL GAME SYSTEM
+   ========================================================= */
+
+const gameScreen = document.getElementById("gameScreen");
+const gameTitle = document.getElementById("gameTitle");
+
+function openGame(game) {
+
+    gameScreen.classList.add("active");
+
+    document.querySelectorAll(".game-content > div").forEach(el => {
+        el.classList.add("hidden");
+    });
+
+    if (game === "lightning") {
+        gameTitle.textContent = "⚡ Lightning Rush";
+        document.getElementById("lightningGame").classList.remove("hidden");
+        openLightning();
+    }
+
+    if (game === "target") {
+        gameTitle.textContent = "🎯 Target";
+        document.getElementById("targetGame").classList.remove("hidden");
+        openTarget();
+    }
+
+    if (game === "dodge") {
+        gameTitle.textContent = "🟦 Dodge";
+        document.getElementById("dodgeGame").classList.remove("hidden");
+    }
+
+    if (game === "memory") {
+        gameTitle.textContent = "🧠 Memory";
+        document.getElementById("memoryGame").classList.remove("hidden");
+    }
+}
+
+function closeGame() {
+
+    gameScreen.classList.remove("active");
+
+    clearTimeout(lightningTimeout);
+    clearInterval(targetTimer);
+
+    lightningTarget.style.display = "none";
+    targetCircle.style.display = "none";
+
+    targetRunning = false;
+    lightningRunning = false;
+}
+
+
+/* =========================================================
+   LIGHTNING RUSH
+   ========================================================= */
+
+let lightningTimeout = null;
+let lightningStartTime = 0;
+let lightningScore = 0;
+let lightningRunning = false;
+
+let lightningBest =
+    Number(localStorage.getItem("lightningBest")) || 0;
+
+const lightningTarget =
+    document.getElementById("lightningTarget");
+
+function openLightning() {
+
+    document.getElementById("lightningScore").textContent =
+        lightningScore;
+
+    document.getElementById("lightningBest").textContent =
+        lightningBest;
+
+    lightningTarget.style.display = "none";
+}
+
+function startLightning() {
+
+    clearTimeout(lightningTimeout);
+
+    lightningScore = 0;
+    lightningRunning = true;
+
+    document.getElementById("lightningScore").textContent = 0;
+
+    document.getElementById("lightningStart").textContent =
+        "WAIT...";
+
+    lightningTarget.style.display = "none";
+
+    const delay =
+        Math.floor(Math.random() * 2200) + 900;
+
+    lightningTimeout = setTimeout(() => {
+
+        if (!lightningRunning) return;
+
+        lightningStartTime = performance.now();
+
+        positionLightning();
+
+        lightningTarget.style.display = "block";
+
+        document.getElementById("lightningStart").textContent =
+            "CLICK THE ⚡";
+
+    }, delay);
+}
+
+function positionLightning() {
+
+    const area =
+        document.getElementById("lightningArea");
+
+    const maxX =
+        area.clientWidth - 50;
+
+    const maxY =
+        area.clientHeight - 50;
+
+    lightningTarget.style.left =
+        Math.max(5, Math.random() * maxX) + "px";
+
+    lightningTarget.style.top =
+        Math.max(5, Math.random() * maxY) + "px";
+}
+
+function hitLightning() {
+
+    if (!lightningRunning) return;
+
+    const reaction =
+        performance.now() - lightningStartTime;
+
+    lightningScore++;
+
+    if (lightningScore > lightningBest) {
+
+        lightningBest = lightningScore;
+
+        localStorage.setItem(
+            "lightningBest",
+            lightningBest
+        );
+    }
+
+    document.getElementById("lightningScore").textContent =
+        lightningScore;
+
+    document.getElementById("lightningBest").textContent =
+        lightningBest;
+
+    lightningTarget.style.display = "none";
+
+    const nextDelay =
+        Math.max(350, 1700 - lightningScore * 55);
+
+    lightningTimeout = setTimeout(() => {
+
+        if (!lightningRunning) return;
+
+        lightningStartTime = performance.now();
+
+        positionLightning();
+
+        lightningTarget.style.display = "block";
+
+    }, nextDelay);
+}
+
+
+/* =========================================================
+   TARGET GAME
+   ========================================================= */
+
+let targetScore = 0;
+let targetClicks = 0;
+let targetHits = 0;
+let targetTime = 30;
+let targetTimer = null;
+let targetRunning = false;
+let targetSize = 65;
+
+let targetBest =
+    Number(localStorage.getItem("targetBest")) || 0;
+
+const targetArea =
+    document.getElementById("targetArea");
+
+const targetCircle =
+    document.getElementById("targetCircle");
+
+function openTarget() {
+
+    targetBest =
+        Number(localStorage.getItem("targetBest")) || 0;
+
+    document.getElementById("targetScore").textContent = 0;
+    document.getElementById("targetBest").textContent = targetBest;
+    document.getElementById("targetTime").textContent = 30;
+    document.getElementById("targetAccuracy").textContent = "100%";
+
+    document.getElementById("targetCountdown").textContent =
+        "Click START to begin.";
+
+    document.getElementById("targetStart").classList.remove("hidden");
+
+    document.getElementById("targetResults").classList.add("hidden");
+
+    targetCircle.style.display = "none";
+}
+
+function startTarget() {
+
+    clearInterval(targetTimer);
+
+    targetScore = 0;
+    targetClicks = 0;
+    targetHits = 0;
+    targetTime = 30;
+    targetSize = 65;
+    targetRunning = true;
+
+    document.getElementById("targetResults").classList.add("hidden");
+
+    document.getElementById("targetStart").classList.add("hidden");
+
+    document.getElementById("targetScore").textContent = "0";
+    document.getElementById("targetTime").textContent = "30";
+    document.getElementById("targetAccuracy").textContent = "100%";
+
+    document.getElementById("targetCountdown").textContent =
+        "GET READY...";
+
+    setTimeout(() => {
+
+        if (!targetRunning) return;
+
+        spawnTarget();
+
+        document.getElementById("targetCountdown").textContent =
+            "CLICK THE TARGET!";
+
+    }, 500);
+
+    targetTimer = setInterval(() => {
+
+        if (!targetRunning) return;
+
+        targetTime--;
+
+        document.getElementById("targetTime").textContent =
+            targetTime;
+
+        if (targetTime <= 0) {
+
+            endTarget();
+
+        }
+
+    }, 1000);
+}
+
+function spawnTarget() {
+
+    if (!targetRunning) return;
+
+    const areaWidth =
+        targetArea.clientWidth;
+
+    const areaHeight =
+        targetArea.clientHeight;
+
+    /*
+       Difficulty increases as score increases.
+       Target gets smaller, but never becomes ridiculous.
+    */
+
+    targetSize =
+        Math.max(
+            28,
+            65 - targetScore * 1.4
+        );
+
+    targetCircle.style.width =
+        targetSize + "px";
+
+    targetCircle.style.height =
+        targetSize + "px";
+
+    const maxX =
+        areaWidth - targetSize;
+
+    const maxY =
+        areaHeight - targetSize;
+
+    const x =
+        Math.random() * Math.max(0, maxX);
+
+    const y =
+        Math.random() * Math.max(0, maxY);
+
+    targetCircle.style.left = x + "px";
+    targetCircle.style.top = y + "px";
+
+    targetCircle.style.display = "flex";
+}
+
+function hitTarget(event) {
+
+    if (!targetRunning) return;
+
+    event.stopPropagation();
+
+    targetClicks++;
+    targetHits++;
+    targetScore++;
+
+    document.getElementById("targetScore").textContent =
+        targetScore;
+
+    updateTargetAccuracy();
+
+    targetCircle.style.display = "none";
+
+    /*
+       Tiny pause before spawning the next target.
+       This prevents accidental double-clicks.
+    */
+
+    setTimeout(() => {
+
+        if (targetRunning) {
+            spawnTarget();
+        }
+
+    }, Math.max(40, 150 - targetScore * 3));
+}
+
+targetArea.addEventListener("click", () => {
+
+    if (!targetRunning) return;
+
+    /*
+       Clicking the background counts as a miss.
+    */
+
+    targetClicks++;
+
+    updateTargetAccuracy();
+
+});
+
+function updateTargetAccuracy() {
+
+    if (targetClicks === 0) {
+
+        document.getElementById("targetAccuracy").textContent =
+            "100%";
+
+        return;
+    }
+
+    const accuracy =
+        Math.round(
+            (targetHits / targetClicks) * 100
+        );
+
+    document.getElementById("targetAccuracy").textContent =
+        accuracy + "%";
+}
+
+function endTarget() {
+
+    targetRunning = false;
+
+    clearInterval(targetTimer);
+
+    targetCircle.style.display = "none";
+
+    if (targetScore > targetBest) {
+
+        targetBest = targetScore;
+
+        localStorage.setItem(
+            "targetBest",
+            targetBest
+        );
+    }
+
+    updateTargetAccuracy();
+
+    document.getElementById("targetFinalScore").textContent =
+        targetScore;
+
+    document.getElementById("targetFinalBest").textContent =
+        "Best: " + targetBest;
+
+    document.getElementById("targetFinalAccuracy").textContent =
+        "Accuracy: " +
+        document.getElementById("targetAccuracy").textContent;
+
+    let message;
+
+    if (targetScore >= 45) {
+        message = "ABSOLUTELY DISGUSTING. 😭🔥";
+    }
+    else if (targetScore >= 35) {
+        message = "Okay bro is LOCKED IN.";
+    }
+    else if (targetScore >= 25) {
+        message = "Pretty solid. 👀";
+    }
+    else if (targetScore >= 15) {
+        message = "Not bad. Keep cooking.";
+    }
+    else {
+        message = "Bro got cooked 💀";
+    }
+
+    document.getElementById("targetFinalMessage").textContent =
+        message;
+
+    document.getElementById("targetResults").classList.remove("hidden");
+
+    document.getElementById("targetCountdown").textContent =
+        "Round complete.";
+}
+
+
+/* =========================================================
+   ESC TO CLOSE
+   ========================================================= */
+
+document.addEventListener("keydown", event => {
+
+    if (event.key === "Escape") {
+        closeGame();
+    }
+
+});
+
+</script>
+
+</body>
+</html>
